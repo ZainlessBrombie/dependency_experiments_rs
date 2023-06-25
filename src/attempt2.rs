@@ -88,42 +88,47 @@ impl<'a, T: Autowirable> Deref for Dep<T> {
     }
 }
 
-struct A {
-    b: Dep<B>,
-    v: String,
-}
+#[cfg(test)]
+mod tests {
+    use crate::attempt2::{Autowirable, Context, Dep};
 
-struct B {
-    a: Dep<A>,
-    v: String,
-}
-
-impl Autowirable for A {
-    fn post_init(&self) {
-        println!("Post init A {}", self.b.v);
+    struct A {
+        b: Dep<B>,
+        v: String,
     }
-}
 
-impl Autowirable for B {
-    fn post_init(&self) {
-        println!("Post init B {}", self.a.v);
+    struct B {
+        a: Dep<A>,
+        v: String,
     }
-}
 
-#[test]
-fn test_basic() {
-    let mut context = Context::new();
-    context.register_type(|context| A {
-        b: context.get(),
-        v: "VA".to_string(),
-    });
-    context.register_type(|context| B {
-        a: context.get(),
-        v: "VB".to_string(),
-    });
+    impl Autowirable for A {
+        fn post_init(&self) {
+            println!("Post init A {}", self.b.v);
+        }
+    }
 
-    context.init();
+    impl Autowirable for B {
+        fn post_init(&self) {
+            println!("Post init B {}", self.a.v);
+        }
+    }
 
-    println!("{}", context.get::<A>().v);
-    println!("{}", context.get::<B>().v);
+    #[test]
+    fn test_basic() {
+        let mut context = Context::new();
+        context.register_type(|context| A {
+            b: context.get(),
+            v: "VA".to_string(),
+        });
+        context.register_type(|context| B {
+            a: context.get(),
+            v: "VB".to_string(),
+        });
+
+        context.init();
+
+        println!("{}", context.get::<A>().v);
+        println!("{}", context.get::<B>().v);
+    }
 }
