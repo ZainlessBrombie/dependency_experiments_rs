@@ -18,8 +18,8 @@ struct ContextEntry {
 
 pub struct Context {
     content: HashMap<TypeId, ContextEntry>,
-    constructors: Vec<Box<dyn Fn(&Context) + Send + Sync>>,
-    initializers: Vec<Box<dyn Fn(&Context) + Send + Sync>>,
+    constructors: Vec<Box<dyn FnOnce(&Context) + Send + Sync>>,
+    initializers: Vec<Box<dyn FnOnce(&Context) + Send + Sync>>,
 }
 
 fn asserter() -> impl Send {
