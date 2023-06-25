@@ -35,7 +35,7 @@ impl Context {
         }
     }
 
-    pub fn register_type<T: Autowirable, F: Fn(&Context) -> T + Send + Sync + 'static>(
+    pub fn register<T: Autowirable, F: FnOnce(&Context) -> T + Send + Sync + 'static>(
         &mut self,
         getter: F,
     ) {
